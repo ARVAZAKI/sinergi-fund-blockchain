@@ -1,0 +1,690 @@
+basePath: /
+definitions:
+  models.CreateDonationRequest:
+    properties:
+      amount:
+        example: "100000"
+        type: string
+      donationId:
+        example: donation123
+        type: string
+      eventCode:
+        example: RAMADAN2025
+        type: string
+      message:
+        example: Semoga bermanfaat
+        type: string
+      senderName:
+        example: John Doe
+        type: string
+    required:
+    - amount
+    - donationId
+    - senderName
+    type: object
+  models.CreateEventRequest:
+    properties:
+      code:
+        example: RAMADAN2025
+        type: string
+      description:
+        example: Annual charity drive during Ramadan month
+        type: string
+      endDate:
+        example: "2025-04-30T23:59:59Z"
+        type: string
+      isActive:
+        example: "true"
+        type: string
+      name:
+        example: Ramadan Charity Drive
+        type: string
+      startDate:
+        example: "2025-03-01T00:00:00Z"
+        type: string
+    required:
+    - code
+    - description
+    - endDate
+    - isActive
+    - name
+    - startDate
+    type: object
+  models.DonationResponse:
+    properties:
+      data: {}
+      message:
+        example: Donation created successfully
+        type: string
+      success:
+        example: true
+        type: boolean
+    type: object
+  models.ErrorResponse:
+    properties:
+      error:
+        example: Detailed error description
+        type: string
+      message:
+        example: Error message
+        type: string
+      success:
+        example: false
+        type: boolean
+    type: object
+  models.EventResponse:
+    properties:
+      data: {}
+      message:
+        example: Event created successfully
+        type: string
+      success:
+        example: true
+        type: boolean
+    type: object
+  models.TotalDonationResponse:
+    properties:
+      currentAmount:
+        example: 300000
+        type: number
+      message:
+        example: Total donations retrieved successfully
+        type: string
+      success:
+        example: true
+        type: boolean
+      totalAmount:
+        example: 350000
+        type: number
+      totalCount:
+        example: 3
+        type: integer
+    type: object
+  models.UpdateEventDetailRequest:
+    properties:
+      description:
+        example: Updated description for annual charity drive
+        type: string
+      endDate:
+        example: "2025-04-30T23:59:59Z"
+        type: string
+      isActive:
+        example: "true"
+        type: string
+      name:
+        example: Updated Ramadan Charity Drive
+        type: string
+      startDate:
+        example: "2025-03-01T00:00:00Z"
+        type: string
+    required:
+    - description
+    - endDate
+    - isActive
+    - name
+    - startDate
+    type: object
+  models.UpdateEventRequest:
+    properties:
+      isActive:
+        example: "false"
+        type: string
+    required:
+    - isActive
+    type: object
+  models.Withdrawal:
+    properties:
+      amount:
+        minimum: 0.01
+        type: number
+      date_time:
+        type: string
+      event_code:
+        type: string
+      id:
+        type: string
+      timestamp:
+        type: string
+      tx_id:
+        type: string
+      withdraw_by:
+        type: string
+    required:
+    - amount
+    - date_time
+    - event_code
+    - withdraw_by
+    type: object
+  models.WithdrawalRequest:
+    properties:
+      amount:
+        minimum: 0.01
+        type: number
+      event_code:
+        type: string
+      withdraw_by:
+        type: string
+    required:
+    - amount
+    - event_code
+    - withdraw_by
+    type: object
+  models.WithdrawalResponse:
+    properties:
+      data:
+        $ref: '#/definitions/models.Withdrawal'
+      message:
+        type: string
+      success:
+        type: boolean
+    type: object
+  models.WithdrawalsResponse:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/models.Withdrawal'
+        type: array
+      message:
+        type: string
+      success:
+        type: boolean
+    type: object
+host: localhost:3000
+info:
+  contact:
+    email: support@vafund.com
+    name: API Support
+  description: Backend API untuk aplikasi VaFund menggunakan Go Fiber dan Hyperledger
+    Fabric
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+  termsOfService: http://swagger.io/terms/
+  title: VaFund Backend API
+  version: "1.0"
+paths:
+  /api/donations:
+    get:
+      description: Get a list of all donations
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.DonationResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Get all donations
+      tags:
+      - donations
+    post:
+      consumes:
+      - application/json
+      description: Create a new donation with sender name, amount and optional message
+      parameters:
+      - description: Donation data
+        in: body
+        name: donation
+        required: true
+        schema:
+          $ref: '#/definitions/models.CreateDonationRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.DonationResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Create a new donation
+      tags:
+      - donations
+  /api/donations/{id}:
+    get:
+      description: Get a specific donation by its ID
+      parameters:
+      - description: Donation ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.DonationResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Get donation by ID
+      tags:
+      - donations
+  /api/donations/by-amount:
+    get:
+      description: Get a list of donations that have at least the specified amount
+      parameters:
+      - description: Minimum donation amount
+        in: query
+        name: minAmount
+        required: true
+        type: number
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.DonationResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Get donations by minimum amount
+      tags:
+      - donations
+  /api/donations/event/{eventCode}:
+    get:
+      description: Get a list of donations associated with a specific event
+      parameters:
+      - description: Event Code
+        in: path
+        name: eventCode
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.DonationResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Get donations by event code
+      tags:
+      - donations
+  /api/donations/event/{eventCode}/total:
+    get:
+      description: Get total amount and count of donations for a specific event with
+        current amount after withdrawals
+      parameters:
+      - description: Event Code
+        in: path
+        name: eventCode
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.TotalDonationResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Get total donation statistics by event code with current amount (net
+        of withdrawals)
+      tags:
+      - donations
+  /api/donations/total:
+    get:
+      description: Get total amount and count of all donations
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.TotalDonationResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Get total donation statistics
+      tags:
+      - donations
+  /api/events:
+    get:
+      description: Get a list of all events
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.EventResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Get all events
+      tags:
+      - events
+    post:
+      consumes:
+      - application/json
+      description: Create a new event with code, name, start date, end date and active
+        status
+      parameters:
+      - description: Event data
+        in: body
+        name: event
+        required: true
+        schema:
+          $ref: '#/definitions/models.CreateEventRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.EventResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Create a new event
+      tags:
+      - events
+  /api/events/{code}:
+    get:
+      description: Get a specific event by its code
+      parameters:
+      - description: Event Code
+        in: path
+        name: code
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.EventResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Get event by code
+      tags:
+      - events
+    put:
+      consumes:
+      - application/json
+      description: Update event details including name, dates, and status
+      parameters:
+      - description: Event Code
+        in: path
+        name: code
+        required: true
+        type: string
+      - description: Event update data
+        in: body
+        name: event
+        required: true
+        schema:
+          $ref: '#/definitions/models.UpdateEventDetailRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.EventResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Update event details
+      tags:
+      - events
+  /api/events/{code}/status:
+    put:
+      consumes:
+      - application/json
+      description: Update the active status of an event (activate/deactivate)
+      parameters:
+      - description: Event Code
+        in: path
+        name: code
+        required: true
+        type: string
+      - description: Event status update
+        in: body
+        name: status
+        required: true
+        schema:
+          $ref: '#/definitions/models.UpdateEventRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.EventResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Update event status
+      tags:
+      - events
+  /api/events/active:
+    get:
+      description: Get a list of events that are currently active and within their
+        date range
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.EventResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Get active events
+      tags:
+      - events
+  /api/withdrawals:
+    get:
+      description: Get list of all withdrawals
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.WithdrawalsResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.WithdrawalsResponse'
+      summary: Get all withdrawals
+      tags:
+      - withdrawals
+    post:
+      consumes:
+      - application/json
+      description: Create a new withdrawal record
+      parameters:
+      - description: Withdrawal data
+        in: body
+        name: withdrawal
+        required: true
+        schema:
+          $ref: '#/definitions/models.WithdrawalRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.WithdrawalResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.WithdrawalResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.WithdrawalResponse'
+      summary: Create withdrawal
+      tags:
+      - withdrawals
+  /api/withdrawals/{id}:
+    get:
+      description: Get a specific withdrawal by ID
+      parameters:
+      - description: Withdrawal ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.WithdrawalResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.WithdrawalResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.WithdrawalResponse'
+      summary: Get withdrawal by ID
+      tags:
+      - withdrawals
+  /api/withdrawals/event/{event_code}:
+    get:
+      description: Get list of withdrawals for a specific event
+      parameters:
+      - description: Event Code
+        in: path
+        name: event_code
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.WithdrawalsResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.WithdrawalsResponse'
+      summary: Get withdrawals by event code
+      tags:
+      - withdrawals
+  /api/withdrawals/event/{event_code}/total:
+    get:
+      description: Get total amount of withdrawals for a specific event
+      parameters:
+      - description: Event Code
+        in: path
+        name: event_code
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Get total withdrawal amount by event code
+      tags:
+      - withdrawals
+  /api/withdrawals/total:
+    get:
+      description: Get total amount of all withdrawals
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Get total withdrawal amount
+      tags:
+      - withdrawals
+schemes:
+- http
+swagger: "2.0"

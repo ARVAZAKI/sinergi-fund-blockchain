@@ -9,7 +9,6 @@
 *.test
 
 # Output of the go build command
-vafund-backend
 vafund-backend.exe
 main
 main.exe
