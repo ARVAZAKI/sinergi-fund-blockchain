@@ -1,0 +1,112 @@
+# Binaries for programs and plugins
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Test binary, built with `go build -race`
+*.test
+
+# Output of the go build command
+vafund-backend
+vafund-backend.exe
+main
+main.exe
+
+# Go workspace file
+go.work
+
+# Dependency directories
+vendor/
+
+# Go modules
+# Uncomment if you want to ignore go.mod and go.sum
+# go.mod
+# go.sum
+
+# Environment variables
+.env
+.env.local
+.env.development
+.env.test
+.env.production
+*.env
+
+# Crypto materials and certificates
+crypto/
+*.pem
+*.crt
+*.key
+*.cert
+*.p12
+*.pfx
+
+# Hyperledger Fabric artifacts
+organizations/
+channel-artifacts/
+ledgers/
+*.block
+*.tx
+*.yaml.bak
+
+# Docker volumes and data
+fabric-data/
+data/
+
+# Logs
+*.log
+logs/
+log/
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.temp
+temp/
+tmp/
+
+# Build artifacts
+dist/
+build/
+out/
+
+# Node.js (if any frontend components)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Chaincode packages
+*.tar.gz
+*.zip
+chaincode-packages/
+
+# Backup files
+*.bak
+*.backup
+*~
+
+# Coverage reports
+coverage.txt
+coverage.out
+*.cover
+
+# Test results
+test-results/
+*.xml
