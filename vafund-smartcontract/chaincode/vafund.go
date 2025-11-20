@@ -14,6 +14,7 @@ type SmartContract struct {
 	donationService   *services.DonationService
 	eventService      *services.EventService
 	withdrawalService *services.WithdrawalService
+	galleryService    *services.GalleryService
 }
 
 func NewSmartContract() *SmartContract {
@@ -21,6 +22,7 @@ func NewSmartContract() *SmartContract {
 		donationService:   services.NewDonationService(),
 		eventService:      services.NewEventService(),
 		withdrawalService: services.NewWithdrawalService(),
+		galleryService:    services.NewGalleryService(),
 	}
 }
 
@@ -212,6 +214,57 @@ func (s *SmartContract) WithdrawalExists(ctx contractapi.TransactionContextInter
 		s.withdrawalService = services.NewWithdrawalService()
 	}
 	return s.withdrawalService.Exists(ctx, id)
+}
+
+// ===== GALLERY FUNCTIONS =====
+
+func (s *SmartContract) CreateGallery(ctx contractapi.TransactionContextInterface, id string, eventCode string, imageURL string, description string) error {
+	if s.galleryService == nil {
+		s.galleryService = services.NewGalleryService()
+	}
+	return s.galleryService.Create(ctx, id, eventCode, imageURL, description)
+}
+
+func (s *SmartContract) UpdateGallery(ctx contractapi.TransactionContextInterface, id string, eventCode string, imageURL string, description string) error {
+	if s.galleryService == nil {
+		s.galleryService = services.NewGalleryService()
+	}
+	return s.galleryService.Update(ctx, id, eventCode, imageURL, description)
+}
+
+func (s *SmartContract) DeleteGallery(ctx contractapi.TransactionContextInterface, id string) error {
+	if s.galleryService == nil {
+		s.galleryService = services.NewGalleryService()
+	}
+	return s.galleryService.Delete(ctx, id)
+}
+
+func (s *SmartContract) ReadGallery(ctx contractapi.TransactionContextInterface, id string) (*entities.Gallery, error) {
+	if s.galleryService == nil {
+		s.galleryService = services.NewGalleryService()
+	}
+	return s.galleryService.GetByID(ctx, id)
+}
+
+func (s *SmartContract) GetAllGalleries(ctx contractapi.TransactionContextInterface) ([]*entities.Gallery, error) {
+	if s.galleryService == nil {
+		s.galleryService = services.NewGalleryService()
+	}
+	return s.galleryService.GetAll(ctx)
+}
+
+func (s *SmartContract) GetGalleriesByEventCode(ctx contractapi.TransactionContextInterface, eventCode string) ([]*entities.Gallery, error) {
+	if s.galleryService == nil {
+		s.galleryService = services.NewGalleryService()
+	}
+	return s.galleryService.GetByEventCode(ctx, eventCode)
+}
+
+func (s *SmartContract) GalleryExists(ctx contractapi.TransactionContextInterface, id string) (bool, error) {
+	if s.galleryService == nil {
+		s.galleryService = services.NewGalleryService()
+	}
+	return s.galleryService.Exists(ctx, id)
 }
 
 // ===== TEST FUNCTIONS =====

@@ -60,8 +60,9 @@ func main() {
 	donationController := controllers.NewDonationController(fabricService)
 	eventController := controllers.NewEventController(fabricService)
 	withdrawalController := controllers.NewWithdrawalController()
+	galleryController := controllers.NewGalleryController(fabricService)
 
-	routes.SetupRoutes(app, donationController, eventController, withdrawalController)
+	routes.SetupRoutes(app, donationController, eventController, withdrawalController, galleryController)
 
 	log.Printf("🚀 VaFund Backend API starting on port %s", cfg.Port)
 	log.Printf("🌐 Access the API at: http://localhost:%s", cfg.Port)

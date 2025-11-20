@@ -82,6 +82,16 @@ definitions:
         example: true
         type: boolean
     type: object
+  models.GalleryResponse:
+    properties:
+      data: {}
+      message:
+        example: Gallery created successfully
+        type: string
+      success:
+        example: true
+        type: boolean
+    type: object
   models.TotalDonationResponse:
     properties:
       currentAmount:
@@ -545,6 +555,203 @@ paths:
       summary: Get active events
       tags:
       - events
+  /api/gallery:
+    get:
+      description: Get all galleries from the blockchain
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.GalleryResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Get all galleries
+      tags:
+      - gallery
+    post:
+      consumes:
+      - multipart/form-data
+      description: Create a new gallery entry with image upload
+      parameters:
+      - description: Gallery ID
+        in: formData
+        name: id
+        required: true
+        type: string
+      - description: Event Code
+        in: formData
+        name: eventCode
+        required: true
+        type: string
+      - description: Description
+        in: formData
+        name: description
+        type: string
+      - description: Image file
+        in: formData
+        name: image
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.GalleryResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Create a new gallery entry
+      tags:
+      - gallery
+  /api/gallery/{id}:
+    delete:
+      description: Delete a gallery entry and its associated image
+      parameters:
+      - description: Gallery ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.GalleryResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Delete gallery entry
+      tags:
+      - gallery
+    get:
+      description: Get a specific gallery by its ID
+      parameters:
+      - description: Gallery ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.GalleryResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Get gallery by ID
+      tags:
+      - gallery
+    put:
+      consumes:
+      - multipart/form-data
+      description: Update an existing gallery entry with optional new image
+      parameters:
+      - description: Gallery ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Event Code
+        in: formData
+        name: eventCode
+        required: true
+        type: string
+      - description: Description
+        in: formData
+        name: description
+        type: string
+      - description: New image file (optional)
+        in: formData
+        name: image
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.GalleryResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Update gallery entry
+      tags:
+      - gallery
+  /api/gallery/{id}/image:
+    get:
+      description: Get the actual image file for a gallery entry
+      parameters:
+      - description: Gallery ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - image/jpeg
+      - image/png
+      - image/gif
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: file
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Get gallery image
+      tags:
+      - gallery
+  /api/gallery/event/{eventCode}:
+    get:
+      description: Get all galleries associated with a specific event
+      parameters:
+      - description: Event Code
+        in: path
+        name: eventCode
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.GalleryResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Get galleries by event code
+      tags:
+      - gallery
   /api/withdrawals:
     get:
       description: Get list of all withdrawals

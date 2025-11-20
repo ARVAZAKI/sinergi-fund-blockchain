@@ -7,7 +7,7 @@ import (
 	"github.com/gofiber/swagger"
 )
 
-func SetupRoutes(app *fiber.App, donationController *controllers.DonationController, eventController *controllers.EventController, withdrawalController *controllers.WithdrawalController) {
+func SetupRoutes(app *fiber.App, donationController *controllers.DonationController, eventController *controllers.EventController, withdrawalController *controllers.WithdrawalController, galleryController *controllers.GalleryController) {
 	// Swagger endpoint
 	app.Get("/swagger/*", swagger.HandlerDefault)
 
@@ -40,6 +40,16 @@ func SetupRoutes(app *fiber.App, donationController *controllers.DonationControl
 	withdrawals.Get("/event/:event_code", withdrawalController.GetWithdrawalsByEventCode)
 	withdrawals.Get("/event/:event_code/total", withdrawalController.GetTotalWithdrawalsByEventCode)
 	withdrawals.Get("/:id", withdrawalController.GetWithdrawal)
+
+	// Gallery routes
+	gallery := api.Group("/gallery")
+	gallery.Post("/", galleryController.CreateGallery)
+	gallery.Get("/", galleryController.GetAllGalleries)
+	gallery.Get("/event/:eventCode", galleryController.GetGalleriesByEventCode)
+	gallery.Get("/:id", galleryController.GetGallery)
+	gallery.Get("/:id/image", galleryController.GetGalleryImage)
+	gallery.Put("/:id", galleryController.UpdateGallery)
+	gallery.Delete("/:id", galleryController.DeleteGallery)
 
 	// Health check endpoint
 	// @Summary Health Check

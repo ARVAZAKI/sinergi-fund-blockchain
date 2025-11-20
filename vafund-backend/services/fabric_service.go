@@ -30,6 +30,7 @@ type FabricService struct {
 	donations   map[string]*models.Donation
 	events      map[string]*models.Event
 	withdrawals map[string]*models.Withdrawal
+	galleries   map[string]*models.Gallery
 }
 
 func NewFabricService() *FabricService {
@@ -37,6 +38,7 @@ func NewFabricService() *FabricService {
 		donations:   make(map[string]*models.Donation),
 		events:      make(map[string]*models.Event),
 		withdrawals: make(map[string]*models.Withdrawal),
+		galleries:   make(map[string]*models.Gallery),
 	}
 }
 
@@ -1003,3 +1005,196 @@ func (fs *FabricService) GetTotalWithdrawalsByEventCode(eventCode string) (float
 		return total, nil
 	}
 }
+
+// ===== GALLERY FUNCTIONS =====
+
+func (fs *FabricService) CreateGallery(id string, eventCode string, imageURL string, description string) (*models.Gallery, error) {
+	if fs.isConnected && fs.contract != nil {
+		// Real Fabric mode
+		_, err := fs.contract.SubmitTransaction("CreateGallery", id, eventCode, imageURL, description)
+		if err != nil {
+			return nil, fmt.Errorf("failed to submit transaction: %v", err)
+		}
+
+		// Read back the created gallery
+		result, err := fs.contract.EvaluateTransaction("ReadGallery", id)
+		if err != nil {
+			return nil, fmt.Errorf("failed to read created gallery: %v", err)
+		}
+
+		var gallery models.Gallery
+		err = json.Unmarshal(result, &gallery)
+		if err != nil {
+			return nil, fmt.Errorf("failed to unmarshal gallery: %v", err)
+		}
+
+		return &gallery, nil
+	} else {
+		// Simulation mode
+		if _, exists := fs.galleries[id]; exists {
+			return nil, fmt.Errorf("gallery %s already exists", id)
+		}
+
+		gallery := &models.Gallery{
+			ID:          id,
+			EventCode:   eventCode,
+			ImageURL:    imageURL,
+			Description: description,
+			Timestamp:   time.Now(),
+			TxID:        fmt.Sprintf("sim-tx-%d", time.Now().UnixNano()),
+		}
+
+		fs.galleries[id] = gallery
+		return gallery, nil
+	}
+}
+
+func (fs *FabricService) GetGallery(galleryID string) (*models.Gallery, error) {
+	if fs.isConnected && fs.contract != nil {
+		// Real Fabric mode
+		result, err := fs.contract.EvaluateTransaction("ReadGallery", galleryID)
+		if err != nil {
+			return nil, fmt.Errorf("failed to read gallery: %v", err)
+		}
+
+		var gallery models.Gallery
+		err = json.Unmarshal(result, &gallery)
+		if err != nil {
+			return nil, fmt.Errorf("failed to unmarshal gallery: %v", err)
+		}
+
+		return &gallery, nil
+	} else {
+		// Simulation mode
+		if galleryID == "" {
+			return nil, fmt.Errorf("gallery ID is required")
+		}
+
+		gallery, exists := fs.galleries[galleryID]
+		if !exists {
+			return nil, fmt.Errorf("gallery %s does not exist", galleryID)
+		}
+
+		return gallery, nil
+	}
+}
+
+func (fs *FabricService) GetAllGalleries() ([]*models.Gallery, error) {
+	if fs.isConnected && fs.contract != nil {
+		// Real Fabric mode
+		result, err := fs.contract.EvaluateTransaction("GetAllGalleries")
+		if err != nil {
+			return nil, fmt.Errorf("failed to get all galleries: %v", err)
+		}
+
+		// Check if result is empty
+		if len(result) == 0 || string(result) == "" || string(result) == "null" || string(result) == "[]" {
+			return []*models.Gallery{}, nil
+		}
+
+		var galleries []*models.Gallery
+		err = json.Unmarshal(result, &galleries)
+		if err != nil {
+			return nil, fmt.Errorf("failed to unmarshal galleries: %v", err)
+		}
+
+		return galleries, nil
+	} else {
+		// Simulation mode
+		var galleries []*models.Gallery
+		for _, gallery := range fs.galleries {
+			galleries = append(galleries, gallery)
+		}
+		return galleries, nil
+	}
+}
+
+func (fs *FabricService) GetGalleriesByEventCode(eventCode string) ([]*models.Gallery, error) {
+	if fs.isConnected && fs.contract != nil {
+		// Real Fabric mode
+		result, err := fs.contract.EvaluateTransaction("GetGalleriesByEventCode", eventCode)
+		if err != nil {
+			return nil, fmt.Errorf("failed to get galleries by event code: %v", err)
+		}
+
+		// Check if result is empty
+		if len(result) == 0 || string(result) == "" || string(result) == "null" || string(result) == "[]" {
+			return []*models.Gallery{}, nil
+		}
+
+		var galleries []*models.Gallery
+		err = json.Unmarshal(result, &galleries)
+		if err != nil {
+			return nil, fmt.Errorf("failed to unmarshal galleries: %v", err)
+		}
+
+		return galleries, nil
+	} else {
+		// Simulation mode
+		var eventGalleries []*models.Gallery
+		for _, gallery := range fs.galleries {
+			if gallery.EventCode == eventCode {
+				eventGalleries = append(eventGalleries, gallery)
+			}
+		}
+		return eventGalleries, nil
+	}
+}
+
+func (fs *FabricService) UpdateGallery(id string, eventCode string, imageURL string, description string) (*models.Gallery, error) {
+	if fs.isConnected && fs.contract != nil {
+		// Real Fabric mode
+		_, err := fs.contract.SubmitTransaction("UpdateGallery", id, eventCode, imageURL, description)
+		if err != nil {
+			return nil, fmt.Errorf("failed to submit transaction: %v", err)
+		}
+
+		// Read back the updated gallery
+		result, err := fs.contract.EvaluateTransaction("ReadGallery", id)
+		if err != nil {
+			return nil, fmt.Errorf("failed to read updated gallery: %v", err)
+		}
+
+		var gallery models.Gallery
+		err = json.Unmarshal(result, &gallery)
+		if err != nil {
+			return nil, fmt.Errorf("failed to unmarshal gallery: %v", err)
+		}
+
+		return &gallery, nil
+	} else {
+		// Simulation mode
+		gallery, exists := fs.galleries[id]
+		if !exists {
+			return nil, fmt.Errorf("gallery %s does not exist", id)
+		}
+
+		gallery.EventCode = eventCode
+		gallery.ImageURL = imageURL
+		gallery.Description = description
+		gallery.Timestamp = time.Now()
+		gallery.TxID = fmt.Sprintf("sim-tx-%d", time.Now().UnixNano())
+
+		return gallery, nil
+	}
+}
+
+func (fs *FabricService) DeleteGallery(galleryID string) error {
+	if fs.isConnected && fs.contract != nil {
+		// Real Fabric mode
+		_, err := fs.contract.SubmitTransaction("DeleteGallery", galleryID)
+		if err != nil {
+			return fmt.Errorf("failed to delete gallery: %v", err)
+		}
+		return nil
+	} else {
+		// Simulation mode
+		if _, exists := fs.galleries[galleryID]; !exists {
+			return fmt.Errorf("gallery %s does not exist", galleryID)
+		}
+
+		delete(fs.galleries, galleryID)
+		return nil
+	}
+}
+
