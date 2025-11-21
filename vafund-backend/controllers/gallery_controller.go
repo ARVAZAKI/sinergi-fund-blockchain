@@ -19,8 +19,8 @@ type GalleryController struct {
 }
 
 func NewGalleryController(fabricService *services.FabricService) *GalleryController {
-	// Path to assets folder in smartcontract
-	assetsPath := "../vafund-smartcontract/assets"
+	// Path to assets folder inside container
+	assetsPath := "/app/assets"
 	
 	// Create assets directory if it doesn't exist
 	if err := os.MkdirAll(assetsPath, 0755); err != nil {
