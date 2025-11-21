@@ -7,11 +7,11 @@ import (
 // Gallery represents a gallery image for an event
 type Gallery struct {
 	ID          string    `json:"id"`
-	EventCode   string    `json:"event_code"`
-	ImageURL    string    `json:"image_url"`
+	EventCode   string    `json:"eventCode"`
+	ImageURL    string    `json:"imageUrl"`
 	Description string    `json:"description"`
 	Timestamp   time.Time `json:"timestamp"`
-	TxID        string    `json:"tx_id"`
+	TxID        string    `json:"txId"`
 }
 
 // NewGallery creates a new Gallery instance

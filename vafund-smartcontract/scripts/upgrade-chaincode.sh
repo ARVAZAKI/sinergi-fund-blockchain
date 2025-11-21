@@ -74,7 +74,10 @@ CHANNEL_NAME="vafundchannel"
 
 # Get current version
 echo "🔍 Checking current chaincode version..."
-CURRENT_VERSION=$(peer lifecycle chaincode querycommitted -C $CHANNEL_NAME -n $CHAINCODE_NAME 2>/dev/null | grep "Version:" | awk '{print $2}' | sed 's/,//')
+COMMITTED_INFO=$(peer lifecycle chaincode querycommitted -C $CHANNEL_NAME -n $CHAINCODE_NAME 2>/dev/null)
+
+CURRENT_VERSION=$(echo "$COMMITTED_INFO" | grep "Version:" | awk '{print $2}' | sed 's/,//')
+CURRENT_SEQUENCE=$(echo "$COMMITTED_INFO" | grep "Sequence:" | awk '{print $2}' | sed 's/,//')
 
 if [ -z "$CURRENT_VERSION" ]; then
     echo "❌ Error: Could not find current chaincode version"
@@ -83,6 +86,10 @@ if [ -z "$CURRENT_VERSION" ]; then
 fi
 
 echo "📦 Current version: $CURRENT_VERSION"
+echo "📦 Current sequence: $CURRENT_SEQUENCE"
+
+NEW_SEQUENCE=$((CURRENT_SEQUENCE + 1))
+echo "🆕 New sequence: $NEW_SEQUENCE"
 
 # Calculate new version (increment)
 if [[ $CURRENT_VERSION =~ ^([0-9]+)\.([0-9]+)$ ]]; then
@@ -172,7 +179,7 @@ peer lifecycle chaincode approveformyorg \
     --name $CHAINCODE_NAME \
     --version $NEW_VERSION \
     --package-id $PACKAGE_ID \
-    --sequence 2
+    --sequence $NEW_SEQUENCE
 
 if [ $? -ne 0 ]; then
     echo "❌ Failed to approve chaincode for Org1"
@@ -197,7 +204,7 @@ peer lifecycle chaincode approveformyorg \
     --name $CHAINCODE_NAME \
     --version $NEW_VERSION \
     --package-id $PACKAGE_ID \
-    --sequence 2
+    --sequence $NEW_SEQUENCE
 
 if [ $? -ne 0 ]; then
     echo "❌ Failed to approve chaincode for Org2"
@@ -212,7 +219,7 @@ peer lifecycle chaincode checkcommitreadiness \
     --channelID $CHANNEL_NAME \
     --name $CHAINCODE_NAME \
     --version $NEW_VERSION \
-    --sequence 2 \
+    --sequence $NEW_SEQUENCE \
     --output json
 
 echo ""
@@ -227,7 +234,7 @@ peer lifecycle chaincode commit \
     --channelID $CHANNEL_NAME \
     --name $CHAINCODE_NAME \
     --version $NEW_VERSION \
-    --sequence 2 \
+    --sequence $NEW_SEQUENCE \
     --peerAddresses localhost:7051 \
     --tlsRootCertFiles "${PWD}/organizations/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/ca.crt" \
     --peerAddresses localhost:9051 \
