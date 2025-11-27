@@ -199,7 +199,7 @@ definitions:
       success:
         type: boolean
     type: object
-host: localhost:3000
+host: 10.41.27.107:3000
 info:
   contact:
     email: support@vafund.com

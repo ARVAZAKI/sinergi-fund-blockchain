@@ -6,7 +6,7 @@
 // @contact.email support@vafund.com
 // @license.name MIT
 // @license.url https://opensource.org/licenses/MIT
-// @host localhost:3000
+// @host 10.41.27.107:3000
 // @BasePath /
 // @schemes http
 package main
@@ -41,6 +41,7 @@ func main() {
 		AllowMethods: "GET,POST,HEAD,PUT,DELETE,PATCH",
 		AllowHeaders: "Origin, Content-Type, Accept, Authorization",
 	}))
+	
 
 	fabricService := services.NewFabricService()
 
@@ -69,7 +70,7 @@ func main() {
 	log.Printf("📚 Swagger UI: http://localhost:%s/swagger/", cfg.Port)
 	log.Printf("❤️  Health check: http://localhost:%s/api/health", cfg.Port)
 
-	if err := app.Listen(":" + cfg.Port); err != nil {
+	if err := app.Listen("0.0.0.0:" + cfg.Port); err != nil {
 		log.Fatalf("Error starting server: %v", err)
 	}
 }
