@@ -8,6 +8,7 @@ type Event struct {
 	Code        string    `json:"code"`
 	Name        string    `json:"name"`
 	Description string    `json:"description"`
+	ImgUrl      string    `json:"imgUrl"`
 	StartDate   time.Time `json:"startDate"`
 	EndDate     time.Time `json:"endDate"`
 	IsActive    bool      `json:"isActive"`
@@ -15,11 +16,12 @@ type Event struct {
 	TxID        string    `json:"txId"`
 }
 
-func NewEvent(code, name, description string, startDate, endDate time.Time, isActive bool, timestamp time.Time, txID string) *Event {
+func NewEvent(code, name, description, imgUrl string, startDate, endDate time.Time, isActive bool, timestamp time.Time, txID string) *Event {
 	return &Event{
 		Code:        code,
 		Name:        name,
 		Description: description,
+		ImgUrl:      imgUrl,
 		StartDate:   startDate,
 		EndDate:     endDate,
 		IsActive:    isActive,

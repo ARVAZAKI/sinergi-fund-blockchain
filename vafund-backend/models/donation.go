@@ -45,6 +45,7 @@ type Event struct {
 	Code        string    `json:"code" example:"RAMADAN2025"`
 	Name        string    `json:"name" example:"Ramadan Charity Drive"`
 	Description string    `json:"description" example:"Annual charity drive during Ramadan month"`
+	ImgUrl      string    `json:"imgUrl" example:"/api/events/RAMADAN2025/image"`
 	StartDate   time.Time `json:"startDate" example:"2025-03-01T00:00:00Z"`
 	EndDate     time.Time `json:"endDate" example:"2025-04-30T23:59:59Z"`
 	IsActive    bool      `json:"isActive" example:"true"`

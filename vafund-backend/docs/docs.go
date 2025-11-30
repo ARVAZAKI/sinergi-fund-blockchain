@@ -309,9 +309,9 @@ const docTemplate = `{
                 }
             },
             "post": {
-                "description": "Create a new event with code, name, start date, end date and active status",
+                "description": "Create a new event with code, name, start date, end date, active status and image",
                 "consumes": [
-                    "application/json"
+                    "multipart/form-data"
                 ],
                 "produces": [
                     "application/json"
@@ -322,13 +322,52 @@ const docTemplate = `{
                 "summary": "Create a new event",
                 "parameters": [
                     {
-                        "description": "Event data",
-                        "name": "event",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/models.CreateEventRequest"
-                        }
+                        "type": "string",
+                        "description": "Event Code",
+                        "name": "code",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Event Name",
+                        "name": "name",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Event Description",
+                        "name": "description",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Start Date (RFC3339 format)",
+                        "name": "startDate",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "End Date (RFC3339 format)",
+                        "name": "endDate",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Is Active (true/false)",
+                        "name": "isActive",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "file",
+                        "description": "Event Image",
+                        "name": "image",
+                        "in": "formData"
                     }
                 ],
                 "responses": {
@@ -420,9 +459,9 @@ const docTemplate = `{
                 }
             },
             "put": {
-                "description": "Update event details including name, dates, and status",
+                "description": "Update event details including name, dates, status and optional image",
                 "consumes": [
-                    "application/json"
+                    "multipart/form-data"
                 ],
                 "produces": [
                     "application/json"
@@ -440,13 +479,45 @@ const docTemplate = `{
                         "required": true
                     },
                     {
-                        "description": "Event update data",
-                        "name": "event",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/models.UpdateEventDetailRequest"
-                        }
+                        "type": "string",
+                        "description": "Event Name",
+                        "name": "name",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Event Description",
+                        "name": "description",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Start Date (RFC3339 format)",
+                        "name": "startDate",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "End Date (RFC3339 format)",
+                        "name": "endDate",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Is Active (true/false)",
+                        "name": "isActive",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "file",
+                        "description": "New Event Image (optional)",
+                        "name": "image",
+                        "in": "formData"
                     }
                 ],
                 "responses": {
@@ -470,6 +541,43 @@ const docTemplate = `{
                     },
                     "500": {
                         "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/events/{code}/image": {
+            "get": {
+                "description": "Get the actual image file for an event",
+                "produces": [
+                    "image/jpeg",
+                    "image/png",
+                    "image/gif"
+                ],
+                "tags": [
+                    "events"
+                ],
+                "summary": "Get event image",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Event Code",
+                        "name": "code",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "file"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
                         "schema": {
                             "$ref": "#/definitions/models.ErrorResponse"
                         }
@@ -1074,43 +1182,6 @@ const docTemplate = `{
                 }
             }
         },
-        "models.CreateEventRequest": {
-            "type": "object",
-            "required": [
-                "code",
-                "description",
-                "endDate",
-                "isActive",
-                "name",
-                "startDate"
-            ],
-            "properties": {
-                "code": {
-                    "type": "string",
-                    "example": "RAMADAN2025"
-                },
-                "description": {
-                    "type": "string",
-                    "example": "Annual charity drive during Ramadan month"
-                },
-                "endDate": {
-                    "type": "string",
-                    "example": "2025-04-30T23:59:59Z"
-                },
-                "isActive": {
-                    "type": "string",
-                    "example": "true"
-                },
-                "name": {
-                    "type": "string",
-                    "example": "Ramadan Charity Drive"
-                },
-                "startDate": {
-                    "type": "string",
-                    "example": "2025-03-01T00:00:00Z"
-                }
-            }
-        },
         "models.DonationResponse": {
             "type": "object",
             "properties": {
@@ -1192,38 +1263,6 @@ const docTemplate = `{
                 "totalCount": {
                     "type": "integer",
                     "example": 3
-                }
-            }
-        },
-        "models.UpdateEventDetailRequest": {
-            "type": "object",
-            "required": [
-                "description",
-                "endDate",
-                "isActive",
-                "name",
-                "startDate"
-            ],
-            "properties": {
-                "description": {
-                    "type": "string",
-                    "example": "Updated description for annual charity drive"
-                },
-                "endDate": {
-                    "type": "string",
-                    "example": "2025-04-30T23:59:59Z"
-                },
-                "isActive": {
-                    "type": "string",
-                    "example": "true"
-                },
-                "name": {
-                    "type": "string",
-                    "example": "Updated Ramadan Charity Drive"
-                },
-                "startDate": {
-                    "type": "string",
-                    "example": "2025-03-01T00:00:00Z"
                 }
             }
         },
@@ -1329,7 +1368,7 @@ const docTemplate = `{
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
 	Version:          "1.0",
-	Host:             "10.41.27.107:3000",
+	Host:             "152.42.162.181:3000",
 	BasePath:         "/",
 	Schemes:          []string{"http"},
 	Title:            "VaFund Backend API",

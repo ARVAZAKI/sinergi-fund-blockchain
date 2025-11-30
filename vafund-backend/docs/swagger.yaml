@@ -22,34 +22,6 @@ definitions:
     - donationId
     - senderName
     type: object
-  models.CreateEventRequest:
-    properties:
-      code:
-        example: RAMADAN2025
-        type: string
-      description:
-        example: Annual charity drive during Ramadan month
-        type: string
-      endDate:
-        example: "2025-04-30T23:59:59Z"
-        type: string
-      isActive:
-        example: "true"
-        type: string
-      name:
-        example: Ramadan Charity Drive
-        type: string
-      startDate:
-        example: "2025-03-01T00:00:00Z"
-        type: string
-    required:
-    - code
-    - description
-    - endDate
-    - isActive
-    - name
-    - startDate
-    type: object
   models.DonationResponse:
     properties:
       data: {}
@@ -109,30 +81,6 @@ definitions:
       totalCount:
         example: 3
         type: integer
-    type: object
-  models.UpdateEventDetailRequest:
-    properties:
-      description:
-        example: Updated description for annual charity drive
-        type: string
-      endDate:
-        example: "2025-04-30T23:59:59Z"
-        type: string
-      isActive:
-        example: "true"
-        type: string
-      name:
-        example: Updated Ramadan Charity Drive
-        type: string
-      startDate:
-        example: "2025-03-01T00:00:00Z"
-        type: string
-    required:
-    - description
-    - endDate
-    - isActive
-    - name
-    - startDate
     type: object
   models.UpdateEventRequest:
     properties:
@@ -199,7 +147,7 @@ definitions:
       success:
         type: boolean
     type: object
-host: 10.41.27.107:3000
+host: 152.42.162.181:3000
 info:
   contact:
     email: support@vafund.com
@@ -405,16 +353,44 @@ paths:
       - events
     post:
       consumes:
-      - application/json
-      description: Create a new event with code, name, start date, end date and active
-        status
+      - multipart/form-data
+      description: Create a new event with code, name, start date, end date, active
+        status and image
       parameters:
-      - description: Event data
-        in: body
-        name: event
+      - description: Event Code
+        in: formData
+        name: code
         required: true
-        schema:
-          $ref: '#/definitions/models.CreateEventRequest'
+        type: string
+      - description: Event Name
+        in: formData
+        name: name
+        required: true
+        type: string
+      - description: Event Description
+        in: formData
+        name: description
+        required: true
+        type: string
+      - description: Start Date (RFC3339 format)
+        in: formData
+        name: startDate
+        required: true
+        type: string
+      - description: End Date (RFC3339 format)
+        in: formData
+        name: endDate
+        required: true
+        type: string
+      - description: Is Active (true/false)
+        in: formData
+        name: isActive
+        required: true
+        type: string
+      - description: Event Image
+        in: formData
+        name: image
+        type: file
       produces:
       - application/json
       responses:
@@ -462,20 +438,44 @@ paths:
       - events
     put:
       consumes:
-      - application/json
-      description: Update event details including name, dates, and status
+      - multipart/form-data
+      description: Update event details including name, dates, status and optional
+        image
       parameters:
       - description: Event Code
         in: path
         name: code
         required: true
         type: string
-      - description: Event update data
-        in: body
-        name: event
+      - description: Event Name
+        in: formData
+        name: name
         required: true
-        schema:
-          $ref: '#/definitions/models.UpdateEventDetailRequest'
+        type: string
+      - description: Event Description
+        in: formData
+        name: description
+        required: true
+        type: string
+      - description: Start Date (RFC3339 format)
+        in: formData
+        name: startDate
+        required: true
+        type: string
+      - description: End Date (RFC3339 format)
+        in: formData
+        name: endDate
+        required: true
+        type: string
+      - description: Is Active (true/false)
+        in: formData
+        name: isActive
+        required: true
+        type: string
+      - description: New Event Image (optional)
+        in: formData
+        name: image
+        type: file
       produces:
       - application/json
       responses:
@@ -496,6 +496,31 @@ paths:
           schema:
             $ref: '#/definitions/models.ErrorResponse'
       summary: Update event details
+      tags:
+      - events
+  /api/events/{code}/image:
+    get:
+      description: Get the actual image file for an event
+      parameters:
+      - description: Event Code
+        in: path
+        name: code
+        required: true
+        type: string
+      produces:
+      - image/jpeg
+      - image/png
+      - image/gif
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: file
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Get event image
       tags:
       - events
   /api/events/{code}/status:

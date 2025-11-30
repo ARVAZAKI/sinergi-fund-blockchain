@@ -17,7 +17,7 @@ func NewEventService() *EventService {
 	return &EventService{}
 }
 
-func (es *EventService) Create(ctx contractapi.TransactionContextInterface, code string, name string, description string, startDateStr string, endDateStr string, isActiveStr string) error {
+func (es *EventService) Create(ctx contractapi.TransactionContextInterface, code string, name string, description string, imgUrl string, startDateStr string, endDateStr string, isActiveStr string) error {
 	exists, err := es.Exists(ctx, code)
 	if err != nil {
 		return err
@@ -50,6 +50,7 @@ func (es *EventService) Create(ctx contractapi.TransactionContextInterface, code
 		code,
 		name,
 		description,
+		imgUrl,
 		startDate,
 		endDate,
 		isActive,
@@ -162,7 +163,7 @@ func (es *EventService) UpdateStatus(ctx contractapi.TransactionContextInterface
 }
 
 // Update updates an event with new information
-func (es *EventService) Update(ctx contractapi.TransactionContextInterface, code string, name string, description string, startDateStr string, endDateStr string, isActiveStr string) error {
+func (es *EventService) Update(ctx contractapi.TransactionContextInterface, code string, name string, description string, imgUrl string, startDateStr string, endDateStr string, isActiveStr string) error {
 	// Check if event exists
 	exists, err := es.Exists(ctx, code)
 	if err != nil {
@@ -231,6 +232,7 @@ func (es *EventService) Update(ctx contractapi.TransactionContextInterface, code
 		code,
 		name,
 		description,
+		imgUrl,
 		startDate,
 		endDate,
 		isActive,

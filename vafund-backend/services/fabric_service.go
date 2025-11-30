@@ -518,13 +518,14 @@ func (fs *FabricService) GetCurrentAmountByEventCode(eventCode string) (float64,
 
 // ===== EVENT FUNCTIONS =====
 
-func (fs *FabricService) CreateEvent(req models.CreateEventRequest) (*models.Event, error) {
+func (fs *FabricService) CreateEvent(req models.CreateEventRequest, imgUrl string) (*models.Event, error) {
 	if fs.isConnected && fs.contract != nil {
 		// Real Fabric mode
 		_, err := fs.contract.SubmitTransaction("CreateEvent",
 			req.Code,
 			req.Name,
 			req.Description,
+			imgUrl,
 			req.StartDate,
 			req.EndDate,
 			req.IsActive,
@@ -572,13 +573,15 @@ func (fs *FabricService) CreateEvent(req models.CreateEventRequest) (*models.Eve
 		isActive := req.IsActive == "true"
 
 		event := &models.Event{
-			Code:      req.Code,
-			Name:      req.Name,
-			StartDate: startDate,
-			EndDate:   endDate,
-			IsActive:  isActive,
-			Timestamp: time.Now(),
-			TxID:      fmt.Sprintf("sim-event-tx-%d", time.Now().UnixNano()),
+			Code:        req.Code,
+			Name:        req.Name,
+			Description: req.Description,
+			ImgUrl:      imgUrl,
+			StartDate:   startDate,
+			EndDate:     endDate,
+			IsActive:    isActive,
+			Timestamp:   time.Now(),
+			TxID:        fmt.Sprintf("sim-event-tx-%d", time.Now().UnixNano()),
 		}
 
 		fs.events[req.Code] = event
@@ -751,10 +754,10 @@ func (fs *FabricService) UpdateEventStatus(eventCode string, isActiveStr string)
 	}
 }
 
-func (fs *FabricService) UpdateEvent(eventCode string, req models.UpdateEventDetailRequest) (*models.Event, error) {
+func (fs *FabricService) UpdateEvent(eventCode string, req models.UpdateEventDetailRequest, imgUrl string) (*models.Event, error) {
 	if fs.isConnected && fs.contract != nil {
 		// Real Fabric mode
-		_, err := fs.contract.SubmitTransaction("UpdateEvent", eventCode, req.Name, req.Description, req.StartDate, req.EndDate, req.IsActive)
+		_, err := fs.contract.SubmitTransaction("UpdateEvent", eventCode, req.Name, req.Description, imgUrl, req.StartDate, req.EndDate, req.IsActive)
 		if err != nil {
 			return nil, fmt.Errorf("failed to update event: %v", err)
 		}
@@ -790,6 +793,7 @@ func (fs *FabricService) UpdateEvent(eventCode string, req models.UpdateEventDet
 		// Update other fields
 		event.Name = req.Name
 		event.Description = req.Description
+		event.ImgUrl = imgUrl
 		event.IsActive = (req.IsActive == "true")
 		event.Timestamp = time.Now()
 
@@ -1197,4 +1201,3 @@ func (fs *FabricService) DeleteGallery(galleryID string) error {
 		return nil
 	}
 }
-

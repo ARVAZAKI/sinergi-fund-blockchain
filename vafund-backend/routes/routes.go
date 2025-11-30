@@ -29,6 +29,7 @@ func SetupRoutes(app *fiber.App, donationController *controllers.DonationControl
 	events.Get("/", eventController.GetAllEvents)
 	events.Get("/active", eventController.GetActiveEvents)
 	events.Get("/:code", eventController.GetEvent)
+	events.Get("/:code/image", eventController.GetEventImage)
 	events.Put("/:code/status", eventController.UpdateEventStatus)
 	events.Put("/:code", eventController.UpdateEvent)
 

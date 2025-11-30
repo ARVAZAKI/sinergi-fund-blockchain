@@ -116,11 +116,11 @@ func (s *SmartContract) GetCurrentAmountByEventCode(ctx contractapi.TransactionC
 
 // ===== EVENT FUNCTIONS =====
 
-func (s *SmartContract) CreateEvent(ctx contractapi.TransactionContextInterface, code string, name string, description string, startDateStr string, endDateStr string, isActiveStr string) error {
+func (s *SmartContract) CreateEvent(ctx contractapi.TransactionContextInterface, code string, name string, description string, imgUrl string, startDateStr string, endDateStr string, isActiveStr string) error {
 	if s.eventService == nil {
 		s.eventService = services.NewEventService()
 	}
-	return s.eventService.Create(ctx, code, name, description, startDateStr, endDateStr, isActiveStr)
+	return s.eventService.Create(ctx, code, name, description, imgUrl, startDateStr, endDateStr, isActiveStr)
 }
 
 func (s *SmartContract) ReadEvent(ctx contractapi.TransactionContextInterface, code string) (*entities.Event, error) {
@@ -158,11 +158,11 @@ func (s *SmartContract) UpdateEventStatus(ctx contractapi.TransactionContextInte
 	return s.eventService.UpdateStatus(ctx, code, isActiveStr)
 }
 
-func (s *SmartContract) UpdateEvent(ctx contractapi.TransactionContextInterface, code string, name string, description string, startDateStr string, endDateStr string, isActiveStr string) error {
+func (s *SmartContract) UpdateEvent(ctx contractapi.TransactionContextInterface, code string, name string, description string, imgUrl string, startDateStr string, endDateStr string, isActiveStr string) error {
 	if s.eventService == nil {
 		s.eventService = services.NewEventService()
 	}
-	return s.eventService.Update(ctx, code, name, description, startDateStr, endDateStr, isActiveStr)
+	return s.eventService.Update(ctx, code, name, description, imgUrl, startDateStr, endDateStr, isActiveStr)
 }
 
 // ===== WITHDRAWAL FUNCTIONS =====
